@@ -1,9 +1,8 @@
-# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-*.logs
-data/imgs/*.jpg
+checkpoint/*.logs
+data/imgs
 data/test_data
 data/train_data
 .idea
