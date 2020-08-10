@@ -53,7 +53,7 @@ def compute_nme(preds, target):
     return rmse
 
 
-def compute_auc(errors, failureThreshold, step=0.0001, showCurve=True):
+def compute_auc(errors, failureThreshold, step=0.0001, showCurve=False):
     nErrors = len(errors)
     xAxis = list(np.arange(0., failureThreshold + step, step))
     ced = [float(np.count_nonzero([errors <= x])) / nErrors for x in xAxis]
