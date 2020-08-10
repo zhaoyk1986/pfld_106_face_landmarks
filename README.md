@@ -8,7 +8,18 @@
   cd data
   python prepare.py
   ```
-
+  ```bash
+  # data 文件夹结构
+  data/
+  	imgs/
+  	train_data/
+  		imgs/
+  		list.txt
+  	test_data/
+  		imgs/
+  		list.txt
+  ```
+  
 -  训练
 
   ```bash
