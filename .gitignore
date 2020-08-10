@@ -6,7 +6,6 @@ __pycache__/
 data/imgs/*.jpg
 data/test_data
 data/train_data
-
 .idea
 .DS_Store
 *.pth
