@@ -2,7 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
-./checkpoint/train.logs
+train.logs
 data/imgs/*.jpg
 data/test_data
 data/train_data
