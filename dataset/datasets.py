@@ -169,7 +169,7 @@ class WLFWDatasets(data.Dataset):
         return self.img, self.landmark, self.euler_angle
 
     def __len__(self):
-        return len(self.lines)
+        return 10
 
 
 if __name__ == '__main__':

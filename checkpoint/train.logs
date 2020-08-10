@@ -1,16 +1,38 @@
-[2020-08-09 18:02:34,434] [p50117] [train.py:28] [INFO] workers: 4
-[2020-08-09 18:02:34,434] [p50117] [train.py:28] [INFO] devices_id: 0
-[2020-08-09 18:02:34,434] [p50117] [train.py:28] [INFO] test_initial: False
-[2020-08-09 18:02:34,434] [p50117] [train.py:28] [INFO] base_lr: 0.0001
-[2020-08-09 18:02:34,434] [p50117] [train.py:28] [INFO] weight_decay: 1e-06
-[2020-08-09 18:02:34,434] [p50117] [train.py:28] [INFO] lr_patience: 40
-[2020-08-09 18:02:34,434] [p50117] [train.py:28] [INFO] start_epoch: 1
-[2020-08-09 18:02:34,434] [p50117] [train.py:28] [INFO] end_epoch: 1000
-[2020-08-09 18:02:34,434] [p50117] [train.py:28] [INFO] snapshot: ./checkpoint/snapshot/
-[2020-08-09 18:02:34,435] [p50117] [train.py:28] [INFO] log_file: ./checkpoint/train.logs
-[2020-08-09 18:02:34,435] [p50117] [train.py:28] [INFO] tensorboard: ./checkpoint/tensorboard
-[2020-08-09 18:02:34,435] [p50117] [train.py:28] [INFO] resume: 
-[2020-08-09 18:02:34,435] [p50117] [train.py:28] [INFO] dataroot: ./data/train_data/list.txt
-[2020-08-09 18:02:34,435] [p50117] [train.py:28] [INFO] val_dataroot: ./data/test_data/list.txt
-[2020-08-09 18:02:34,435] [p50117] [train.py:28] [INFO] train_batchsize: 256
-[2020-08-09 18:02:34,435] [p50117] [train.py:28] [INFO] val_batchsize: 8
+[2020-08-10 21:01:49,857] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] workers: 16
+[2020-08-10 21:01:49,857] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] devices_id: 0
+[2020-08-10 21:01:49,857] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] test_initial: False
+[2020-08-10 21:01:49,857] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] base_lr: 0.0001
+[2020-08-10 21:01:49,857] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] weight_decay: 1e-06
+[2020-08-10 21:01:49,857] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] lr_patience: 40
+[2020-08-10 21:01:49,857] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] start_epoch: 1
+[2020-08-10 21:01:49,857] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] end_epoch: 1000
+[2020-08-10 21:01:49,857] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] snapshot: ./checkpoint/snapshot/
+[2020-08-10 21:01:49,857] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] log_file: ./checkpoint/train.logs
+[2020-08-10 21:01:49,857] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] tensorboard: ./checkpoint/tensorboard
+[2020-08-10 21:01:49,857] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] resume: 
+[2020-08-10 21:01:49,857] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] dataroot: ./data/test_data/list.txt
+[2020-08-10 21:01:49,857] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] val_dataroot: ./data/test_data/list.txt
+[2020-08-10 21:01:49,857] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] train_batchsize: 4
+[2020-08-10 21:01:49,857] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] val_batchsize: 1
+[2020-08-10 21:01:49,901] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:46] [INFO] total iteration is 3
+[2020-08-10 21:01:50,564] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:64] [INFO] epoch: 1, iteration: 0, train loss: 212.8637
+[2020-08-10 21:01:51,730] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:154] [INFO] epoch: 1, weighted_train_loss: 245.7989, train loss: 68.9842  val:loss: 61.7887
+
+[2020-08-10 21:01:51,731] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:46] [INFO] total iteration is 3
+[2020-08-10 21:01:52,360] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:64] [INFO] epoch: 2, iteration: 0, train loss: 152.8945
+[2020-08-10 21:01:53,274] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:154] [INFO] epoch: 2, weighted_train_loss: 318.6324, train loss: 69.8759  val:loss: 61.4972
+
+[2020-08-10 21:01:53,275] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:46] [INFO] total iteration is 3
+[2020-08-10 21:01:53,782] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:64] [INFO] epoch: 3, iteration: 0, train loss: 278.6832
+[2020-08-10 21:01:54,581] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:154] [INFO] epoch: 3, weighted_train_loss: 196.9982, train loss: 62.6291  val:loss: 61.1913
+
+[2020-08-10 21:01:54,581] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:46] [INFO] total iteration is 3
+[2020-08-10 21:01:55,110] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:64] [INFO] epoch: 4, iteration: 0, train loss: 152.5431
+[2020-08-10 21:01:56,022] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:154] [INFO] epoch: 4, weighted_train_loss: 190.9195, train loss: 59.0286  val:loss: 60.8729
+
+[2020-08-10 21:01:56,023] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:46] [INFO] total iteration is 3
+[2020-08-10 21:01:56,721] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:64] [INFO] epoch: 5, iteration: 0, train loss: 280.4071
+[2020-08-10 21:01:57,479] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:28] [INFO] Save checkpoint to ./checkpoint/snapshot/checkpoint_epoch_5.pth
+[2020-08-10 21:01:57,834] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:154] [INFO] epoch: 5, weighted_train_loss: 172.7223, train loss: 57.0157  val:loss: 60.5148
+
+[2020-08-10 21:01:57,835] [p11073] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:46] [INFO] total iteration is 3

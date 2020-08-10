@@ -44,6 +44,8 @@ def compute_nme(preds, target):
             interocular = np.linalg.norm(pts_gt[36, ] - pts_gt[45, ])
         elif L == 98:
             interocular = np.linalg.norm(pts_gt[60, ] - pts_gt[72, ])
+        elif L == 106:
+            interocular = np.linalg.norm(pts_gt[35, ] - pts_gt[93, ])  # 左眼角和右眼角的距离
         else:
             raise ValueError('Number of landmarks is wrong')
         rmse[i] = np.sum(np.linalg.norm(pts_pred - pts_gt, axis=1)) / (interocular * L)

@@ -40,10 +40,12 @@ def str2bool(v):
 def train(train_loader, plfd_backbone, auxiliarynet, criterion, optimizer,
           epoch, log_interval=10):
     losses = AverageMeter()
-
-    for iteration, (img, landmark_gt, attribute_gt, euler_angle_gt) in enumerate(train_loader):
+    plfd_backbone.train()
+    auxiliarynet.train()
+    # print('is_training:', plfd_backbone.training)
+    logging.info("total iteration is {}".format(len(train_loader)))
+    for iteration, (img, landmark_gt, euler_angle_gt) in enumerate(train_loader):
         img = img.to(device)
-        attribute_gt = attribute_gt.to(device)
         landmark_gt = landmark_gt.to(device)
         euler_angle_gt = euler_angle_gt.to(device)
         plfd_backbone = plfd_backbone.to(device)
@@ -51,7 +53,7 @@ def train(train_loader, plfd_backbone, auxiliarynet, criterion, optimizer,
 
         features, landmarks = plfd_backbone(img)
         angle = auxiliarynet(features)
-        weighted_loss, loss = criterion(attribute_gt, landmark_gt, euler_angle_gt,
+        weighted_loss, loss = criterion(landmark_gt, euler_angle_gt,
                                         angle, landmarks, args.train_batchsize)
         optimizer.zero_grad()
         weighted_loss.backward()
@@ -68,9 +70,8 @@ def validate(wlfw_val_dataloader, plfd_backbone, auxiliarynet, criterion):
     auxiliarynet.eval() 
     losses = []
     with torch.no_grad():
-        for img, landmark_gt, attribute_gt, euler_angle_gt in wlfw_val_dataloader:
+        for img, landmark_gt, euler_angle_gt in wlfw_val_dataloader:
             img = img.to(device)
-            attribute_gt = attribute_gt.to(device)
             landmark_gt = landmark_gt.to(device)
             euler_angle_gt = euler_angle_gt.to(device)
             plfd_backbone = plfd_backbone.to(device)
@@ -195,7 +196,7 @@ def parse_args():
     # --dataset
     parser.add_argument(
         '--dataroot',
-        default='./data/train_data/list.txt',
+        default='./data/test_data/list.txt',
         type=str,
         metavar='PATH')
     parser.add_argument(
@@ -203,8 +204,8 @@ def parse_args():
         default='./data/test_data/list.txt',
         type=str,
         metavar='PATH')
-    parser.add_argument('--train_batchsize', default=1, type=int)
-    parser.add_argument('--val_batchsize', default=8, type=int)
+    parser.add_argument('--train_batchsize', default=4, type=int)
+    parser.add_argument('--val_batchsize', default=1, type=int)
     args = parser.parse_args()
     return args
 
