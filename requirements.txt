@@ -6,3 +6,4 @@ tensorboardX==1.8
 onnxruntime==1.2
 matplotlib
 scipy
+tqdm

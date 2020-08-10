@@ -8,11 +8,14 @@ import numpy as np
 import cv2
 import shutil
 import sys
-sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "..")))
+from tqdm import tqdm
 
 
 def calculate_pitch_yaw_roll(landmarks_2D, cam_w=256, cam_h=256, radians=False):
     """ Return the the pitch  yaw and roll angles associated with the input image.
+    @param cam_h:
+    @param cam_w:
+    @param landmarks_2D:
     @param radians When True it returns the angle in radians, otherwise in degrees.
     """
 
@@ -193,10 +196,6 @@ class ImageDate:
 
                 imgT = cv2.resize(imgT, (self.image_size, self.image_size))
 
-                # if mirror is not None and np.random.choice((True, False)):
-                #     landmark[:, 0] = 1 - landmark[:, 0]
-                #     landmark = landmark[mirror_idx]
-                #     imgT = cv2.flip(imgT, 1)
                 self.imgs.append(imgT)
                 self.landmarks.append(landmark)
 
@@ -244,7 +243,7 @@ def get_dataset_list(imgDir, outDir, landmarkFile, is_train, test_ratio=0.1):
         else:
             lines = lines[num_train:]
 
-        for i, line in enumerate(lines):
+        for i, line in enumerate(tqdm(lines)):
             Img = ImageDate(line, imgDir)
             img_name = Img.path
             Img.load_data(is_train, 5)
@@ -252,8 +251,8 @@ def get_dataset_list(imgDir, outDir, landmarkFile, is_train, test_ratio=0.1):
             filename, _ = os.path.splitext(filename)
             label_txt = Img.save_data(save_img, str(i) + '_' + filename)
             labels.append(label_txt)
-            if ((i + 1) % 100) == 0:
-                print('file: {}/{}'.format(i + 1, len(lines)))
+            # if ((i + 1) % 100) == 0:
+            #     print('file: {}/{}'.format(i + 1, len(lines)))
 
     with open(os.path.join(outDir, 'list.txt'), 'w') as f:
         for label in labels:
