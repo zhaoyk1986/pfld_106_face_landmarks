@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-data/imgs/
+data/imgs/*.jpg
 data/test_data
 data/train_data
 

@@ -1,19 +1,14 @@
 import argparse
 import logging
 from pathlib import Path
-import time
 import os
 
 import numpy as np
 import torch
 
-from torch.utils import data
 from torch.utils.data import DataLoader
 import torchvision
 from torchvision import datasets, transforms
-import torchvision.utils as vutils
-from tensorboardX import SummaryWriter
-
 from dataset.datasets import WLFWDatasets
 from models.pfld import PFLDInference, AuxiliaryNet
 from pfld.loss import PFLDLoss
@@ -28,7 +23,7 @@ def print_args(args):
         logging.info(s)
 
 
-def save_checkpoint(state, filename='checkpoint.pth.tar'):
+def save_checkpoint(state, filename='checkpoint.pth'):
     torch.save(state, filename)
     logging.info('Save checkpoint to {0:}'.format(filename))
 
@@ -43,10 +38,10 @@ def str2bool(v):
 
 
 def train(train_loader, plfd_backbone, auxiliarynet, criterion, optimizer,
-          epoch):
+          epoch, log_interval=10):
     losses = AverageMeter()
 
-    for img, landmark_gt, attribute_gt, euler_angle_gt in train_loader:
+    for iteration, (img, landmark_gt, attribute_gt, euler_angle_gt) in enumerate(train_loader):
         img = img.to(device)
         attribute_gt = attribute_gt.to(device)
         landmark_gt = landmark_gt.to(device)
@@ -63,6 +58,8 @@ def train(train_loader, plfd_backbone, auxiliarynet, criterion, optimizer,
         optimizer.step()
 
         losses.update(loss.item())
+        if iteration % log_interval == 0:
+            logging.info("epoch: {}, iteration: {}, train loss: {:.4f}".format(epoch, iteration, weighted_loss.item()))
     return weighted_loss, loss
 
 
@@ -88,14 +85,12 @@ def validate(wlfw_val_dataloader, plfd_backbone, auxiliarynet, criterion):
 
 def main(args):
     # Step 1: parse args config
-    logging.basicConfig(
-        format=
-        '[%(asctime)s] [p%(process)s] [%(pathname)s:%(lineno)d] [%(levelname)s] %(message)s',
-        level=logging.INFO,
-        handlers=[
-            logging.FileHandler(args.log_file, mode='w'),
-            logging.StreamHandler()
-        ])
+    logging.basicConfig(format='[%(asctime)s] [p%(process)s] [%(pathname)s:%(lineno)d] [%(levelname)s] %(message)s',
+                        level=logging.INFO,
+                        handlers=[logging.FileHandler(args.log_file, mode='w'),
+                                  logging.StreamHandler()
+                                  ]
+                        )
     print_args(args)
 
     # Step 2: model, criterion, optimizer, scheduler
