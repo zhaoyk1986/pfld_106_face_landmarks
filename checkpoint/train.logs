@@ -1,0 +1,16 @@
+[2020-08-09 18:02:34,434] [p50117] [train.py:28] [INFO] workers: 4
+[2020-08-09 18:02:34,434] [p50117] [train.py:28] [INFO] devices_id: 0
+[2020-08-09 18:02:34,434] [p50117] [train.py:28] [INFO] test_initial: False
+[2020-08-09 18:02:34,434] [p50117] [train.py:28] [INFO] base_lr: 0.0001
+[2020-08-09 18:02:34,434] [p50117] [train.py:28] [INFO] weight_decay: 1e-06
+[2020-08-09 18:02:34,434] [p50117] [train.py:28] [INFO] lr_patience: 40
+[2020-08-09 18:02:34,434] [p50117] [train.py:28] [INFO] start_epoch: 1
+[2020-08-09 18:02:34,434] [p50117] [train.py:28] [INFO] end_epoch: 1000
+[2020-08-09 18:02:34,434] [p50117] [train.py:28] [INFO] snapshot: ./checkpoint/snapshot/
+[2020-08-09 18:02:34,435] [p50117] [train.py:28] [INFO] log_file: ./checkpoint/train.logs
+[2020-08-09 18:02:34,435] [p50117] [train.py:28] [INFO] tensorboard: ./checkpoint/tensorboard
+[2020-08-09 18:02:34,435] [p50117] [train.py:28] [INFO] resume: 
+[2020-08-09 18:02:34,435] [p50117] [train.py:28] [INFO] dataroot: ./data/train_data/list.txt
+[2020-08-09 18:02:34,435] [p50117] [train.py:28] [INFO] val_dataroot: ./data/test_data/list.txt
+[2020-08-09 18:02:34,435] [p50117] [train.py:28] [INFO] train_batchsize: 256
+[2020-08-09 18:02:34,435] [p50117] [train.py:28] [INFO] val_batchsize: 8

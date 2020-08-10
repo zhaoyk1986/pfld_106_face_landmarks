@@ -1,0 +1,8 @@
+torchvision==0.4.0
+numpy
+torch==1.2.0
+opencv_python==4.1.0.25
+tensorboardX==1.8
+onnxruntime==1.2
+matplotlib
+scipy
