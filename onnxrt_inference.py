@@ -10,7 +10,7 @@ import cv2
 
 
 onnx_model_path = "./output/pfld-sim.onnx"
-img_path = "/Users/xintao/Desktop/图像.jpeg"
+img_path = "/Users/xintao/Desktop/1.png"
 img = cv2.imread(img_path)
 show_img = True
 

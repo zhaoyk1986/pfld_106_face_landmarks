@@ -1,7 +1,7 @@
 import onnx
 import os
 import argparse
-from models.pfld import PFLDInference
+from models.mobilev3_pfld import PFLDInference
 import torch
 import onnxsim
 
@@ -19,7 +19,7 @@ args = parser.parse_args()
 print("=====> load pytorch checkpoint...")
 checkpoint = torch.load(args.torch_model, map_location=torch.device('cpu'))
 plfd_backbone = PFLDInference()
-plfd_backbone.load_state_dict(checkpoint['plfd_backbone'])
+# plfd_backbone.load_state_dict(checkpoint['plfd_backbone'])
 print("PFLD bachbone:", plfd_backbone)
 
 print("=====> convert pytorch model to onnx...")

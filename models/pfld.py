@@ -69,8 +69,7 @@ class PFLDInference(nn.Module):
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(inplace=True)
 
-        self.conv2 = nn.Conv2d(
-            64, 64, kernel_size=3, stride=1, padding=1, bias=False)
+        self.conv2 = nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(inplace=True)
 
@@ -163,8 +162,8 @@ if __name__ == '__main__':
     print(plfd_backbone)
     from thop import profile
 
-    macs, macs = profile(model=plfd_backbone, inputs=(dummy_input, ), verbose=False)
-    print(f"macs: {macs}, params: {macs}")
+    macs, p = profile(model=plfd_backbone, inputs=(dummy_input, ), verbose=False)
+    print(f"macs: {macs}, params: {p}")
     auxiliarynet = AuxiliaryNet()
     import time
     tic = time.time()
