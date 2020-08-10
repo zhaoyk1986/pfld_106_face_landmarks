@@ -42,6 +42,7 @@ def train(train_loader, plfd_backbone, auxiliarynet, criterion, optimizer,
     losses = AverageMeter()
     plfd_backbone.train()
     auxiliarynet.train()
+
     # print('is_training:', plfd_backbone.training)
     logging.info("total iteration is {}".format(len(train_loader)))
     for iteration, (img, landmark_gt, euler_angle_gt) in enumerate(train_loader):
@@ -196,7 +197,7 @@ def parse_args():
     # --dataset
     parser.add_argument(
         '--dataroot',
-        default='./data/test_data/list.txt',
+        default='./data/train_data/list.txt',
         type=str,
         metavar='PATH')
     parser.add_argument(
