@@ -7,6 +7,11 @@ data/train_data
 data/WFLW
 .idea
 .DS_Store
+data/test_data
+data/train_data
+data/imgs/*.
+*.pth
+
 output
 data/WFLW_images.tar.gz
 # C extensions
