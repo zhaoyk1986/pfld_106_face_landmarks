@@ -105,12 +105,13 @@ def main(args):
         }],
         lr=args.base_lr,
         weight_decay=args.weight_decay)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', patience=args.lr_patience, verbose=True)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min',
+                                                           patience=args.lr_patience, verbose=True)
 
     # step 3: data
     # argumetion
     transform = transforms.Compose([transforms.ToTensor()])
-    wlfwdataset = WLFWDatasets(args.dataroot, transform)
+    wlfwdataset = WLFWDatasets(args.dataroot, transform, img_root=os.path.realpath('./data'))
     dataloader = DataLoader(
         wlfwdataset,
         batch_size=args.train_batchsize,
@@ -118,7 +119,7 @@ def main(args):
         num_workers=args.workers,
         drop_last=False)
 
-    wlfw_val_dataset = WLFWDatasets(args.val_dataroot, transform)
+    wlfw_val_dataset = WLFWDatasets(args.val_dataroot, transform, img_root=os.path.realpath('./data'))
     wlfw_val_dataloader = DataLoader(
         wlfw_val_dataset,
         batch_size=args.val_batchsize,
@@ -126,23 +127,22 @@ def main(args):
         num_workers=args.workers)
 
     # step 4: run
-    # writer = SummaryWriter(args.tensorboard)
     weighted_losses = []
     train_losses = []
     val_losses = []
     for epoch in range(args.start_epoch, args.end_epoch + 1):
         weighted_train_loss, train_loss = train(dataloader, plfd_backbone, auxiliarynet,
                                                 criterion, optimizer, epoch)
-        filename = os.path.join(
-            str(args.snapshot), "checkpoint_epoch_" + str(epoch) + '.pth')
-        save_checkpoint({
-            'epoch': epoch,
-            'plfd_backbone': plfd_backbone.state_dict(),
-            'auxiliarynet': auxiliarynet.state_dict()
-        }, filename)
 
-        val_loss = validate(wlfw_val_dataloader, plfd_backbone, auxiliarynet,
-                            criterion)
+        if epoch % 5 == 0:
+            filename = os.path.join(str(args.snapshot), "checkpoint_epoch_" + str(epoch) + '.pth')
+            save_checkpoint({
+                'epoch': epoch,
+                'plfd_backbone': plfd_backbone.state_dict(),
+                'auxiliarynet': auxiliarynet.state_dict()
+            }, filename)
+
+        val_loss = validate(wlfw_val_dataloader, plfd_backbone, auxiliarynet, criterion)
 
         scheduler.step(val_loss)
 
@@ -151,9 +151,7 @@ def main(args):
         val_losses.append(val_loss.item())
         logging.info("epoch: {}, weighted_train_loss: {:.4f}, train loss: {:.4f}  val:loss: {:.4f}\n"
                      .format(epoch, weighted_train_loss, train_loss, val_loss))
-        # writer.add_scalar('data/weighted_loss', weighted_train_loss, epoch)
-        # writer.add_scalars('data/loss', {'val loss': val_loss, 'train loss': train_loss}, epoch)
-    # writer.close()
+
     weighted_losses = " ".join(list(map(str, weighted_losses)))
     train_losses = " ".join(list(map(str, train_losses)))
     val_losses = " ".join(list(map(str, val_losses)))
@@ -205,7 +203,7 @@ def parse_args():
         default='./data/test_data/list.txt',
         type=str,
         metavar='PATH')
-    parser.add_argument('--train_batchsize', default=256, type=int)
+    parser.add_argument('--train_batchsize', default=1, type=int)
     parser.add_argument('--val_batchsize', default=8, type=int)
     args = parser.parse_args()
     return args

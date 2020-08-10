@@ -234,7 +234,7 @@ def get_dataset_list(imgDir, outDir, landmarkFile, is_train, test_ratio=0.1):
     with open(landmarkFile, 'r') as f:
         lines = f.readlines()
         labels = []
-        save_img = os.path.join(outDir, 'imgs')
+        save_img = os.path.join(os.path.split(outDir)[-1], 'imgs')
         if not os.path.exists(save_img):
             os.mkdir(save_img)
         num_train = int(len(lines) * (1 - test_ratio))
@@ -251,8 +251,6 @@ def get_dataset_list(imgDir, outDir, landmarkFile, is_train, test_ratio=0.1):
             filename, _ = os.path.splitext(filename)
             label_txt = Img.save_data(save_img, str(i) + '_' + filename)
             labels.append(label_txt)
-            # if ((i + 1) % 100) == 0:
-            #     print('file: {}/{}'.format(i + 1, len(lines)))
 
     with open(os.path.join(outDir, 'list.txt'), 'w') as f:
         for label in labels:
