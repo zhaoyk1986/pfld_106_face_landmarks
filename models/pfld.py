@@ -98,7 +98,7 @@ class PFLDInference(nn.Module):
 
         self.avg_pool1 = nn.AvgPool2d(14)
         self.avg_pool2 = nn.AvgPool2d(7)
-        self.fc = nn.Linear(176, 196)
+        self.fc = nn.Linear(176, 106 * 2)
 
     def forward(self, x):  # x: 3, 112, 112
         x = self.relu(self.bn1(self.conv1(x)))  # [64, 56, 56]

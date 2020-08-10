@@ -153,12 +153,12 @@ class WLFWDatasets(data.Dataset):
     def __getitem__(self, index):
         self.line = self.lines[index].strip().split()
         self.img = cv2.imread(self.line[0])
-        self.landmark = np.asarray(self.line[1:197], dtype=np.float32)
-        self.attribute = np.asarray(self.line[197:203], dtype=np.int32)
-        self.euler_angle = np.asarray(self.line[203:206], dtype=np.float32)
+        self.landmark = np.asarray(self.line[1:213], dtype=np.float32)
+        # self.attribute = np.asarray(self.line[197:203], dtype=np.int32)
+        self.euler_angle = np.asarray(self.line[213:], dtype=np.float32)
         if self.transforms:
             self.img = self.transforms(self.img)
-        return self.img, self.landmark, self.attribute, self.euler_angle
+        return self.img, self.landmark, self.euler_angle
 
     def __len__(self):
         return len(self.lines)
