@@ -124,26 +124,26 @@ class PFLDInference(nn.Module):
         self.conv3_1 = MobileBottleneck(16, 24, 3, 2, 64, False, 'RE')
 
         self.block3_2 = MobileBottleneck(24, 24, 3, 1, 72, False, "RE")
-        self.block3_3 = MobileBottleneck(24, 40, 5, 1, 72, True, "RE")
+        self.block3_3 = MobileBottleneck(24, 40, 5, 2, 72, True, "RE")
         self.block3_4 = MobileBottleneck(40, 40, 5, 1, 120, True, "RE")
         self.block3_5 = MobileBottleneck(40, 40, 5, 1, 120, True, "RE")
 
-        self.conv4_1 = MobileBottleneck(40, 80, 3, 1, 240, False, "RE")
+        self.conv4_1 = MobileBottleneck(40, 80, 3, 2, 240, False, "RE")
 
-        self.conv5_1 = MobileBottleneck(80, 80, 3, 1, 240, False, "HS")
-        self.block5_2 = MobileBottleneck(80, 112, 3, 1, 240, True, "HS")
+        self.conv5_1 = MobileBottleneck(80, 80, 3, 1, 200, False, "HS")
+        self.block5_2 = MobileBottleneck(80, 112, 3, 1, 480, True, "HS")
         self.block5_3 = MobileBottleneck(112, 112, 3, 1, 672, True, "HS")
-        self.block5_4 = MobileBottleneck(112, 112, 3, 1, 672, True, "HS")
-        self.block5_5 = MobileBottleneck(112, 112, 3, 1, 672, True, "HS")
+        self.block5_4 = MobileBottleneck(112, 160, 3, 1, 672, True, "HS")
+        self.block5_5 = MobileBottleneck(160, 160, 3, 1, 960, True, "HS")
 
-        self.conv6_1 = MobileBottleneck(112, 16, 3, 2, 64, False, "HS")  # [16, 14, 14]
+        self.conv6_1 = MobileBottleneck(160, 16, 3, 2, 64, False, "HS")  # [16, 14, 14]
 
         self.conv7 = conv_bn(16, 32, 3, 2, nlin_layer=Hswish)  # [32, 7, 7]
         # self.conv8 = conv_bn(32, 128, 7, 1, padding=0, nlin_layer=Hswish)  # [128, 1, 1]
-        self.conv8 = nn.Conv2d(32, 128, 7, 1, 0)
+        self.conv8 = nn.Conv2d(32, 128, 2, 1, 0)
         self.hs = Hswish()
-        self.avg_pool1 = nn.AvgPool2d(14)
-        self.avg_pool2 = nn.AvgPool2d(7)
+        self.avg_pool1 = nn.AvgPool2d(4)
+        self.avg_pool2 = nn.AvgPool2d(2)
         self.fc = nn.Linear(176, 106 * 2)
 
     def forward(self, x):  # x: 3, 112, 112
@@ -202,8 +202,8 @@ class AuxiliaryNet(nn.Module):
         self.conv1 = conv_bn(40, 128, 3, 2)
         self.conv2 = conv_bn(128, 128, 3, 1)
         self.conv3 = conv_bn(128, 32, 3, 2)
-        self.conv4 = conv_bn(32, 128, 7, 1)
-        self.max_pool1 = nn.MaxPool2d(3)
+        self.conv4 = conv_bn(32, 128, 3, 1, padding=1)
+        self.max_pool1 = nn.MaxPool2d(4)
         self.fc1 = nn.Linear(128, 32)
         self.fc2 = nn.Linear(32, 3)
 
@@ -211,6 +211,8 @@ class AuxiliaryNet(nn.Module):
         x = self.conv1(x)
         x = self.conv2(x)
         x = self.conv3(x)
+        # print(x.size())
+        # exit()
         x = self.conv4(x)
         x = self.max_pool1(x)
         x = x.view(x.size(0), -1)
@@ -228,7 +230,7 @@ if __name__ == '__main__':
     from thop import profile
 
     macs, param = profile(model=plfd_backbone, inputs=(dummy_input, ), verbose=False)
-    print(f"macs: {macs}, params: {param}")
+    print(f"macs: {macs / 1000000}, params: {param / 1000000}")
     auxiliarynet = AuxiliaryNet()
     import time
     tic = time.time()
