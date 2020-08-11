@@ -115,6 +115,7 @@ class PFLDInference(nn.Module):
         x = self.block5_4(x)
         x = self.block5_5(x)
         x = self.block5_6(x)
+        # print(x.shape)
         x = self.conv6_1(x)
         x1 = self.avg_pool1(x)
         x1 = x1.view(x1.size(0), -1)
