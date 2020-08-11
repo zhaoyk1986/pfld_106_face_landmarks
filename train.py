@@ -11,7 +11,7 @@ import torchvision
 from torchvision import datasets, transforms
 from dataset.datasets import WLFWDatasets
 from models.ghost_pfld import PFLDInference, AuxiliaryNet
-from pfld.loss import PFLDLoss
+from pfld.loss import PFLDLoss as LandMarkLoss
 from pfld.utils import AverageMeter
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -56,6 +56,7 @@ def train(train_loader, plfd_backbone, auxiliarynet, criterion, optimizer,
         angle = auxiliarynet(features)
         weighted_loss, loss = criterion(landmark_gt, euler_angle_gt,
                                         angle, landmarks, args.train_batchsize)
+        # weighted_loss, loss = criterion(landmarks, landmark_gt)
         optimizer.zero_grad()
         weighted_loss.backward()
         optimizer.step()
@@ -98,7 +99,7 @@ def main(args):
     # Step 2: model, criterion, optimizer, scheduler
     plfd_backbone = PFLDInference().to(device)
     auxiliarynet = AuxiliaryNet().to(device)
-    criterion = PFLDLoss()
+    criterion = LandMarkLoss()
     optimizer = torch.optim.Adam(
         [{
             'params': plfd_backbone.parameters()
