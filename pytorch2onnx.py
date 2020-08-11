@@ -25,7 +25,7 @@ print("PFLD bachbone:", plfd_backbone)
 print("=====> convert pytorch model to onnx...")
 dummy_input = torch.randn(1, 3, 112, 112)
 input_names = ["input_1"]
-output_names = ["output_1"]
+output_names = ["output", "output1"]
 torch.onnx.export(
     plfd_backbone,
     dummy_input,

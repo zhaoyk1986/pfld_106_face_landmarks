@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 import torchvision
 from torchvision import datasets, transforms
 from dataset.datasets import WLFWDatasets
-from models.ghost_pfld import PFLDInference, AuxiliaryNet
+from models.mobilev3_pfld import PFLDInference, AuxiliaryNet
 from pfld.loss import PFLDLoss as LandMarkLoss
 from pfld.utils import AverageMeter
 

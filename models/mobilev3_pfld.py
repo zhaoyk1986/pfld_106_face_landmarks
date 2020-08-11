@@ -181,22 +181,6 @@ class PFLDInference(nn.Module):
         return out1, landmarks
 
 
-class PFLDMobileV3(nn.Module):
-    def __init__(self):
-        super(PFLDMobileV3, self).__init__()
-
-    def forward(self, x):
-        pass
-
-
-class PFLDGhostNet(nn.Module):
-    def __init__(self):
-        super(PFLDGhostNet, self).__init__()
-
-    def forward(self, x):
-        pass
-
-
 class AuxiliaryNet(nn.Module):
     def __init__(self):
         super(AuxiliaryNet, self).__init__()
