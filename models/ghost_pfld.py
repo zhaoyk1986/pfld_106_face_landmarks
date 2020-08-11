@@ -163,30 +163,30 @@ class GhostBottleneck(nn.Module):
         # 2nd ghost bottleneck
         x = self.ghost2(x)
 
-        x += self.shortcut(residual)
+        x = x + self.shortcut(residual)
         return x
 
 
 class PFLDInference(nn.Module):
     def __init__(self):
         super(PFLDInference, self).__init__()
-
+        self.use_attention = False
         self.conv_bn1 = conv_bn(3, 16, 3, stride=1)
         self.conv_bn2 = GhostBottleneck(16, 64, 16, 3, 2, se=False)
 
         self.conv3_1 = GhostBottleneck(16, 64, 24, 3, 2, se=False)
 
         self.block3_2 = GhostBottleneck(24, 72, 24, 3, 1, se=False)
-        self.block3_3 = GhostBottleneck(24, 72, 40, 5, 1, se=True)
-        self.block3_4 = GhostBottleneck(40, 120, 40, 5, 1, se=True)
-        self.block3_5 = GhostBottleneck(40, 120, 40, 5, 1, se=True)
+        self.block3_3 = GhostBottleneck(24, 72, 40, 5, 1, se=self.use_attention)
+        self.block3_4 = GhostBottleneck(40, 120, 40, 5, 1, se=self.use_attention)
+        self.block3_5 = GhostBottleneck(40, 120, 40, 5, 1, se=self.use_attention)
 
         self.conv4_1 = GhostBottleneck(40, 240, 80, 3, 2, se=False)
 
         self.conv5_1 = GhostBottleneck(80, 200, 80, 3, 1, se=False)
-        self.block5_2 = GhostBottleneck(80, 480, 112, 3, 1, se=True)
-        self.block5_3 = GhostBottleneck(112, 672, 112, 3, 1, se=True)
-        self.block5_4 = GhostBottleneck(112, 672, 160, 3, 1, se=True)
+        self.block5_2 = GhostBottleneck(80, 480, 112, 3, 1, se=self.use_attention)
+        self.block5_3 = GhostBottleneck(112, 672, 112, 3, 1, se=self.use_attention)
+        self.block5_4 = GhostBottleneck(112, 672, 160, 3, 1, se=self.use_attention)
         # self.block5_5 = MobileBottleneck(160, 160, 3, 1, 960, True, "HS")
 
         self.conv6_1 = GhostBottleneck(160, 320, 16, 3, 1, se=False)  # [16, 14, 14]

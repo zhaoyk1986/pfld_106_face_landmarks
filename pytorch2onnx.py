@@ -1,7 +1,7 @@
 import onnx
 import os
 import argparse
-from models.mobilev3_pfld import PFLDInference
+from models.ghost_pfld import PFLDInference
 import torch
 import onnxsim
 
@@ -24,8 +24,8 @@ print("PFLD bachbone:", plfd_backbone)
 
 print("=====> convert pytorch model to onnx...")
 dummy_input = torch.randn(1, 3, 112, 112)
-input_names = ["input_1"]
-output_names = ["output", "output1"]
+input_names = ["input"]
+output_names = ["output1", "output"]
 torch.onnx.export(
     plfd_backbone,
     dummy_input,

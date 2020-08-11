@@ -118,23 +118,23 @@ class MobileBottleneck(nn.Module):
 class PFLDInference(nn.Module):
     def __init__(self):
         super(PFLDInference, self).__init__()
-
+        self.use_attention = False
         self.conv_bn1 = conv_bn(3, 16, 3, stride=1, nlin_layer=Hswish)
         self.conv_bn2 = MobileBottleneck(16, 16, 3, 1, 16, False, 'RE')
 
         self.conv3_1 = MobileBottleneck(16, 24, 3, 2, 64, False, 'RE')
 
         self.block3_2 = MobileBottleneck(24, 24, 3, 1, 72, False, "RE")
-        self.block3_3 = MobileBottleneck(24, 40, 5, 2, 72, True, "RE")
-        self.block3_4 = MobileBottleneck(40, 40, 5, 1, 120, True, "RE")
-        self.block3_5 = MobileBottleneck(40, 40, 5, 1, 120, True, "RE")
+        self.block3_3 = MobileBottleneck(24, 40, 5, 2, 72, self.use_attention, "RE")
+        self.block3_4 = MobileBottleneck(40, 40, 5, 1, 120, self.use_attention, "RE")
+        self.block3_5 = MobileBottleneck(40, 40, 5, 1, 120, self.use_attention, "RE")
 
         self.conv4_1 = MobileBottleneck(40, 80, 3, 2, 240, False, "RE")
 
         self.conv5_1 = MobileBottleneck(80, 80, 3, 1, 200, False, "HS")
-        self.block5_2 = MobileBottleneck(80, 112, 3, 1, 480, True, "HS")
-        self.block5_3 = MobileBottleneck(112, 112, 3, 1, 672, True, "HS")
-        self.block5_4 = MobileBottleneck(112, 160, 3, 1, 672, True, "HS")
+        self.block5_2 = MobileBottleneck(80, 112, 3, 1, 480, self.use_attention, "HS")
+        self.block5_3 = MobileBottleneck(112, 112, 3, 1, 672, self.use_attention, "HS")
+        self.block5_4 = MobileBottleneck(112, 160, 3, 1, 672, self.use_attention, "HS")
         # self.block5_5 = MobileBottleneck(160, 160, 3, 1, 960, True, "HS")
 
         self.conv6_1 = MobileBottleneck(160, 16, 3, 1, 320, False, "HS")  # [16, 14, 14]
