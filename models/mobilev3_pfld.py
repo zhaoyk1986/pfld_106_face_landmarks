@@ -226,7 +226,6 @@ class AuxiliaryNet(nn.Module):
 if __name__ == '__main__':
     dummy_input = torch.randn(1, 3, 112, 112)
     plfd_backbone = PFLDInference()
-    torch.save(plfd_backbone.state_dict(), 'mbv3.pth')
     print(plfd_backbone)
     from thop import profile
 
