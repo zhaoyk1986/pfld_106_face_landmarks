@@ -60,7 +60,8 @@ class SEModule(nn.Module):
         # F.avg_pool2d()
         y = self.avg_pool(x).view(b, c)
         y = self.fc(y).view(b, c, 1, 1)
-        return x * y.expand_as(x)
+        # print((x * y == x * y.expand_as(x)).all().all())
+        return x * y
 
 
 class Identity(nn.Module):
