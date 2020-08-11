@@ -164,7 +164,7 @@ if __name__ == '__main__':
     from thop import profile
 
     macs, p = profile(model=plfd_backbone, inputs=(dummy_input, ), verbose=False)
-    print(f"macs: {macs}, params: {p}")
+    print(f"macs: {macs / 1000000.0}, params: {p / 1000000.0}")
     auxiliarynet = AuxiliaryNet()
     import time
     tic = time.time()

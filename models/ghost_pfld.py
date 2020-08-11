@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Time : 2020/8/11 12:10 下午
+# @Author : Xintao
+# @File : ghost_pfld.py
+
 # -*- coding: utf-8 -*-
 # @Time : 2020/4/10 9:50 下午
 # @Author : Xintao
@@ -7,6 +13,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import math
 
 
 def conv_bn(inp, oup, kernel_size, stride, padding=1, conv_layer=nn.Conv2d, norm_layer=nn.BatchNorm2d, nlin_layer=nn.ReLU):
@@ -72,74 +79,119 @@ class Identity(nn.Module):
         return x
 
 
-class MobileBottleneck(nn.Module):
-    def __init__(self, inp, oup, kernel, stride, exp, se=False, nl='RE'):
-        super(MobileBottleneck, self).__init__()
-        assert stride in [1, 2]
-        assert kernel in [3, 5]
-        padding = (kernel - 1) // 2
-        self.use_res_connect = stride == 1 and inp == oup
+class GhostModule(nn.Module):
+    def __init__(self, inp, oup, kernel_size=1, ratio=2, dw_size=3, stride=1, relu=True):
+        super(GhostModule, self).__init__()
+        self.oup = oup
+        init_channels = math.ceil(oup / ratio)
+        new_channels = init_channels * (ratio - 1)
 
-        conv_layer = nn.Conv2d
-        norm_layer = nn.BatchNorm2d
-        if nl == 'RE':
-            nlin_layer = nn.ReLU  # or ReLU6
-        elif nl == 'HS':
-            nlin_layer = Hswish
-        else:
-            raise NotImplementedError
-        if se:
-            SELayer = SEModule
-        else:
-            SELayer = Identity
+        self.primary_conv = nn.Sequential(
+            nn.Conv2d(inp, init_channels, kernel_size, stride, kernel_size // 2, bias=False),
+            nn.BatchNorm2d(init_channels),
+            nn.ReLU(inplace=True) if relu else nn.Sequential(),
+        )
 
-        self.conv = nn.Sequential(
-            # pw
-            conv_layer(inp, exp, 1, 1, 0, bias=False),
-            norm_layer(exp),
-            nlin_layer(inplace=True),
-            # dw
-            conv_layer(exp, exp, kernel, stride, padding, groups=exp, bias=False),
-            norm_layer(exp),
-            SELayer(exp),
-            nlin_layer(inplace=True),
-            # pw-linear
-            conv_layer(exp, oup, 1, 1, 0, bias=False),
-            norm_layer(oup),
+        self.cheap_operation = nn.Sequential(
+            nn.Conv2d(init_channels, new_channels, dw_size, 1, dw_size // 2, groups=init_channels, bias=False),
+            nn.BatchNorm2d(new_channels),
+            nn.ReLU(inplace=True) if relu else nn.Sequential(),
         )
 
     def forward(self, x):
-        if self.use_res_connect:
-            return x + self.conv(x)
+        x1 = self.primary_conv(x)
+        x2 = self.cheap_operation(x1)
+        out = torch.cat([x1, x2], dim=1)
+        return out[:, :self.oup, :, :]
+
+
+class GhostBottleneck(nn.Module):
+    """ Ghost bottleneck w/ optional SE"""
+
+    def __init__(self, in_chs, mid_chs, out_chs, dw_kernel_size=3,
+                 stride=1, act_layer=nn.ReLU, se=False):
+        super(GhostBottleneck, self).__init__()
+        has_se = se
+        self.stride = stride
+
+        # Point-wise expansion
+        self.ghost1 = GhostModule(in_chs, mid_chs, relu=True)
+
+        # Depth-wise convolution
+        if self.stride > 1:
+            self.conv_dw = nn.Conv2d(mid_chs, mid_chs, dw_kernel_size, stride=stride,
+                                     padding=(dw_kernel_size - 1) // 2,
+                                     groups=mid_chs, bias=False)
+            self.bn_dw = nn.BatchNorm2d(mid_chs)
+
+        # Squeeze-and-excitation
+        if has_se:
+            self.se = SEModule(mid_chs)
         else:
-            return self.conv(x)
+            self.se = None
+
+        # Point-wise linear projection
+        self.ghost2 = GhostModule(mid_chs, out_chs, relu=False)
+
+        # shortcut
+        if in_chs == out_chs and self.stride == 1:
+            self.shortcut = nn.Sequential()
+        else:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(in_chs, in_chs, dw_kernel_size, stride=stride,
+                          padding=(dw_kernel_size - 1) // 2, groups=in_chs, bias=False),
+                nn.BatchNorm2d(in_chs),
+                nn.Conv2d(in_chs, out_chs, 1, stride=1, padding=0, bias=False),
+                nn.BatchNorm2d(out_chs),
+            )
+
+    def forward(self, x):
+        residual = x
+
+        # 1st ghost bottleneck
+        x = self.ghost1(x)
+
+        # Depth-wise convolution
+        if self.stride > 1:
+            x = self.conv_dw(x)
+            x = self.bn_dw(x)
+
+        # Squeeze-and-excitation
+        if self.se is not None:
+            x = self.se(x)
+
+        # 2nd ghost bottleneck
+        x = self.ghost2(x)
+
+        x += self.shortcut(residual)
+        return x
 
 
 class PFLDInference(nn.Module):
     def __init__(self):
         super(PFLDInference, self).__init__()
 
-        self.conv_bn1 = conv_bn(3, 16, 3, stride=1, nlin_layer=Hswish)
-        self.conv_bn2 = MobileBottleneck(16, 16, 3, 1, 16, False, 'RE')
+        self.conv_bn1 = conv_bn(3, 16, 3, stride=1)
+        self.conv_bn2 = GhostBottleneck(16, 64, 16, 3, 2, se=False)
 
-        self.conv3_1 = MobileBottleneck(16, 24, 3, 2, 64, False, 'RE')
+        self.conv3_1 = GhostBottleneck(16, 64, 24, 3, 2, se=False)
 
-        self.block3_2 = MobileBottleneck(24, 24, 3, 1, 72, False, "RE")
-        self.block3_3 = MobileBottleneck(24, 40, 5, 2, 72, True, "RE")
-        self.block3_4 = MobileBottleneck(40, 40, 5, 1, 120, True, "RE")
-        self.block3_5 = MobileBottleneck(40, 40, 5, 1, 120, True, "RE")
+        self.block3_2 = GhostBottleneck(24, 72, 24, 3, 1, se=False)
+        self.block3_3 = GhostBottleneck(24, 72, 40, 5, 1, se=True)
+        self.block3_4 = GhostBottleneck(40, 120, 40, 5, 1, se=True)
+        self.block3_5 = GhostBottleneck(40, 120, 40, 5, 1, se=True)
 
-        self.conv4_1 = MobileBottleneck(40, 80, 3, 2, 240, False, "RE")
+        self.conv4_1 = GhostBottleneck(40, 240, 80, 3, 2, se=False)
 
-        self.conv5_1 = MobileBottleneck(80, 80, 3, 1, 200, False, "HS")
-        self.block5_2 = MobileBottleneck(80, 112, 3, 1, 480, True, "HS")
-        self.block5_3 = MobileBottleneck(112, 112, 3, 1, 672, True, "HS")
-        self.block5_4 = MobileBottleneck(112, 160, 3, 1, 672, True, "HS")
+        self.conv5_1 = GhostBottleneck(80, 200, 80, 3, 1, se=False)
+        self.block5_2 = GhostBottleneck(80, 480, 112, 3, 1, se=True)
+        self.block5_3 = GhostBottleneck(112, 672, 112, 3, 1, se=True)
+        self.block5_4 = GhostBottleneck(112, 672, 160, 3, 1, se=True)
         # self.block5_5 = MobileBottleneck(160, 160, 3, 1, 960, True, "HS")
 
-        self.conv6_1 = MobileBottleneck(160, 16, 3, 1, 320, False, "HS")  # [16, 14, 14]
+        self.conv6_1 = GhostBottleneck(160, 320, 16, 3, 1, se=False)  # [16, 14, 14]
 
-        self.conv7 = conv_bn(16, 32, 3, 2, nlin_layer=Hswish)  # [32, 7, 7]
+        self.conv7 = conv_bn(16, 32, 3, 2)  # [32, 7, 7]
         # self.conv8 = conv_bn(32, 128, 7, 1, padding=0, nlin_layer=Hswish)  # [128, 1, 1]
         self.conv8 = nn.Conv2d(32, 128, 7, 1, 0)
         self.hs = Hswish()
@@ -148,8 +200,8 @@ class PFLDInference(nn.Module):
         self.fc = nn.Linear(176, 106 * 2)
 
     def forward(self, x):  # x: 3, 112, 112
-        x = self.conv_bn1(x)  # [64, 56, 56]
-        x = self.conv_bn2(x)  # [64, 56, 56]
+        x = self.conv_bn1(x)
+        x = self.conv_bn2(x)
         x = self.conv3_1(x)
         x = self.block3_2(x)
         x = self.block3_3(x)
@@ -181,22 +233,6 @@ class PFLDInference(nn.Module):
         return out1, landmarks
 
 
-class PFLDMobileV3(nn.Module):
-    def __init__(self):
-        super(PFLDMobileV3, self).__init__()
-
-    def forward(self, x):
-        pass
-
-
-class PFLDGhostNet(nn.Module):
-    def __init__(self):
-        super(PFLDGhostNet, self).__init__()
-
-    def forward(self, x):
-        pass
-
-
 class AuxiliaryNet(nn.Module):
     def __init__(self):
         super(AuxiliaryNet, self).__init__()
@@ -212,8 +248,6 @@ class AuxiliaryNet(nn.Module):
         x = self.conv1(x)
         x = self.conv2(x)
         x = self.conv3(x)
-        # print(x.size())
-        # exit()
         x = self.conv4(x)
         x = self.max_pool1(x)
         x = x.view(x.size(0), -1)

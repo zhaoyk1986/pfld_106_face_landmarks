@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 import torchvision
 from torchvision import datasets, transforms
 from dataset.datasets import WLFWDatasets
-from models.mobilev3_pfld import PFLDInference, AuxiliaryNet
+from models.ghost_pfld import PFLDInference, AuxiliaryNet
 from pfld.loss import PFLDLoss
 from pfld.utils import AverageMeter
 
@@ -136,7 +136,7 @@ def main(args):
         weighted_train_loss, train_loss = train(dataloader, plfd_backbone, auxiliarynet,
                                                 criterion, optimizer, epoch)
 
-        if epoch % 5 == 0:
+        if epoch % args.epoch_interval == 0:
             filename = os.path.join(str(args.snapshot), "checkpoint_epoch_" + str(epoch) + '.pth')
             save_checkpoint({
                 'epoch': epoch,
@@ -193,6 +193,7 @@ def parse_args():
         '--tensorboard', default="./checkpoint/tensorboard", type=str)
     parser.add_argument(
         '--resume', default='', type=str, metavar='PATH')  # TBD
+    parser.add_argument('--epoch_interval', default=1, type=int)
 
     # --dataset
     parser.add_argument(
