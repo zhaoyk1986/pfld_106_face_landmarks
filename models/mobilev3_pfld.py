@@ -129,22 +129,22 @@ class PFLDInference(nn.Module):
         self.block3_4 = MobileBottleneck(40, 40, 5, 1, 120, True, "RE")
         self.block3_5 = MobileBottleneck(40, 40, 5, 1, 120, True, "RE")
 
-        self.conv4_1 = MobileBottleneck(40, 80, 3, 2, 240, False, "RE")
+        self.conv4_1 = MobileBottleneck(40, 80, 3, 1, 240, False, "RE")
 
         self.conv5_1 = MobileBottleneck(80, 80, 3, 1, 200, False, "HS")
         self.block5_2 = MobileBottleneck(80, 112, 3, 1, 480, True, "HS")
         self.block5_3 = MobileBottleneck(112, 112, 3, 1, 672, True, "HS")
         self.block5_4 = MobileBottleneck(112, 160, 3, 1, 672, True, "HS")
-        self.block5_5 = MobileBottleneck(160, 160, 3, 1, 960, True, "HS")
+        # self.block5_5 = MobileBottleneck(160, 160, 3, 1, 960, True, "HS")
 
-        self.conv6_1 = MobileBottleneck(160, 16, 3, 2, 64, False, "HS")  # [16, 14, 14]
+        self.conv6_1 = MobileBottleneck(160, 16, 3, 1, 320, False, "HS")  # [16, 14, 14]
 
         self.conv7 = conv_bn(16, 32, 3, 2, nlin_layer=Hswish)  # [32, 7, 7]
         # self.conv8 = conv_bn(32, 128, 7, 1, padding=0, nlin_layer=Hswish)  # [128, 1, 1]
-        self.conv8 = nn.Conv2d(32, 128, 2, 1, 0)
+        self.conv8 = nn.Conv2d(32, 128, 7, 1, 0)
         self.hs = Hswish()
-        self.avg_pool1 = nn.AvgPool2d(4)
-        self.avg_pool2 = nn.AvgPool2d(2)
+        self.avg_pool1 = nn.AvgPool2d(14)
+        self.avg_pool2 = nn.AvgPool2d(7)
         self.fc = nn.Linear(176, 106 * 2)
 
     def forward(self, x):  # x: 3, 112, 112
@@ -162,7 +162,7 @@ class PFLDInference(nn.Module):
         x = self.block5_2(x)
         x = self.block5_3(x)
         x = self.block5_4(x)
-        x = self.block5_5(x)
+        # x = self.block5_5(x)
         # x = self.block5_6(x)
         x = self.conv6_1(x)
         x1 = self.avg_pool1(x)
@@ -203,8 +203,8 @@ class AuxiliaryNet(nn.Module):
         self.conv1 = conv_bn(40, 128, 3, 2)
         self.conv2 = conv_bn(128, 128, 3, 1)
         self.conv3 = conv_bn(128, 32, 3, 2)
-        self.conv4 = conv_bn(32, 128, 3, 1, padding=1)
-        self.max_pool1 = nn.MaxPool2d(4)
+        self.conv4 = conv_bn(32, 128, 3, 1, padding=0)
+        self.max_pool1 = nn.MaxPool2d(2)
         self.fc1 = nn.Linear(128, 32)
         self.fc2 = nn.Linear(32, 3)
 

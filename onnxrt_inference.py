@@ -10,7 +10,7 @@ import cv2
 
 
 onnx_model_path = "./output/pfld-sim.onnx"
-img_path = "/Users/xintao/Desktop/1.png"
+img_path = "/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/result.jpg"
 img = cv2.imread(img_path)
 show_img = True
 
