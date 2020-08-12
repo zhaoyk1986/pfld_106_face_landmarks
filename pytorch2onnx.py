@@ -1,14 +1,14 @@
 import onnx
 import os
 import argparse
-from models.pfld import PFLDInference
+from models.mobilev3_pfld import PFLDInference
 import torch
 import onnxsim
 
 parser = argparse.ArgumentParser(description='pytorch2onnx')
 parser.add_argument(
     '--torch_model',
-    default="./checkpoint/v2/checkpoint_epoch_103.pth")
+    default="./checkpoint/v3/checkpoint_epoch_21.pth")
 parser.add_argument('--onnx_model', default="./output/pfld.onnx")
 parser.add_argument(
     '--onnx_model_sim',
