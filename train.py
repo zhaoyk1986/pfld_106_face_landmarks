@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 import torchvision
 from torchvision import datasets, transforms
 from dataset.datasets import WLFWDatasets
-from models.mobilev3_pfld import PFLDInference, AuxiliaryNet
+# from models.mobilev3_pfld import PFLDInference, AuxiliaryNet
 from pfld.loss import PFLDLoss as LandMarkLoss
 from pfld.utils import AverageMeter
 
@@ -45,6 +45,7 @@ def train(train_loader, plfd_backbone, auxiliarynet, criterion, optimizer,
 
     # print('is_training:', plfd_backbone.training)
     logging.info("total iteration is {}".format(len(train_loader)))
+    weighted_loss, loss = 0, 0
     for iteration, (img, landmark_gt, euler_angle_gt) in enumerate(train_loader):
         img = img.to(device)
         landmark_gt = landmark_gt.to(device)
@@ -67,10 +68,39 @@ def train(train_loader, plfd_backbone, auxiliarynet, criterion, optimizer,
     return weighted_loss, loss
 
 
+def compute_nme(preds, target):
+    """ preds/target:: numpy array, shape is (N, L, 2)
+        N: batchsize L: num of landmark
+    """
+    N = preds.shape[0]
+    L = preds.shape[1]
+    rmse = np.zeros(N)
+
+    for i in range(N):
+        pts_pred, pts_gt = preds[i, ], target[i, ]
+        if L == 19:  # aflw
+            interocular = 34  # meta['box_size'][i]
+        elif L == 29:  # cofw
+            interocular = np.linalg.norm(pts_gt[8, ] - pts_gt[9, ])
+        elif L == 68:  # 300w
+            # interocular
+            interocular = np.linalg.norm(pts_gt[36, ] - pts_gt[45, ])
+        elif L == 98:
+            interocular = np.linalg.norm(pts_gt[60, ] - pts_gt[72, ])
+        elif L == 106:
+            interocular = np.linalg.norm(pts_gt[35, ] - pts_gt[93, ])  # 左眼角和右眼角的欧式距离
+        else:
+            raise ValueError('Number of landmarks is wrong')
+        rmse[i] = np.sum(np.linalg.norm(pts_pred - pts_gt, axis=1)) / (interocular * L)
+
+    return rmse
+
+
 def validate(wlfw_val_dataloader, plfd_backbone, auxiliarynet, criterion):
     plfd_backbone.eval()
     auxiliarynet.eval() 
     losses = []
+    nme = []
     with torch.no_grad():
         for img, landmark_gt, euler_angle_gt in wlfw_val_dataloader:
             img = img.to(device)
@@ -80,10 +110,16 @@ def validate(wlfw_val_dataloader, plfd_backbone, auxiliarynet, criterion):
             auxiliarynet = auxiliarynet.to(device)
             _, landmark = plfd_backbone(img)
             loss = torch.mean(torch.sum((landmark_gt - landmark)**2, axis=1))
+
+            landmark = landmark.cpu().numpy().reshape(landmark.shape[0], -1, 2)
+            landmark_gt = landmark_gt.cpu().numpy().reshape(landmark_gt.shape[0], -1, 2)
+            nme_i = compute_nme(landmark, landmark_gt)
             losses.append(loss.cpu().numpy())
+            for item in nme_i:
+                nme.append(item)
     print("===> Evaluate:")
-    print('Eval set: Average loss: {:.4f} '.format(np.mean(losses)))
-    return np.mean(losses)
+    print('Eval set: Average loss: {:.4f} nme: {:.4f}'.format(np.mean(losses), np.mean(nme)))
+    return np.mean(losses), np.mean(nme)
 
 
 def main(args):
@@ -95,10 +131,26 @@ def main(args):
                                   ]
                         )
     print_args(args)
+    if args.backbone == "v2":
+        from models.pfld import PFLDInference, AuxiliaryNet
+    elif args.backbone == "v3":
+        from models.mobilev3_pfld import PFLDInference, AuxiliaryNet
+    elif args.backbone == "ghost":
+        from models.ghost_pfld import PFLDInference, AuxiliaryNet
+    else:
+        raise ValueError("backbone is not implemented")
+    plfd_backbone = PFLDInference()
+    auxiliarynet = AuxiliaryNet()
+    if os.path.exists(args.resume) and args.resume.endswith('.pth'):
+        logging.info("loading the checkpoint from {}".format(args.resume))
+        check = torch.load(args.resume, map_location=torch.device('cpu'))
+        plfd_backbone.load_state_dict(check["plfd_backbone"])
+        auxiliarynet.load_state_dict(check["auxiliarynet"])
+        args.start_epoch = check["epoch"]
 
     # Step 2: model, criterion, optimizer, scheduler
-    plfd_backbone = PFLDInference().to(device)
-    auxiliarynet = AuxiliaryNet().to(device)
+    plfd_backbone = plfd_backbone.to(device)
+    auxiliarynet = auxiliarynet.to(device)
     criterion = LandMarkLoss()
     optimizer = torch.optim.Adam(
         [{
@@ -133,6 +185,7 @@ def main(args):
     weighted_losses = []
     train_losses = []
     val_losses = []
+    val_nme = 1e6
     for epoch in range(args.start_epoch, args.end_epoch + 1):
         weighted_train_loss, train_loss = train(dataloader, plfd_backbone, auxiliarynet,
                                                 criterion, optimizer, epoch)
@@ -145,15 +198,22 @@ def main(args):
                 'auxiliarynet': auxiliarynet.state_dict()
             }, filename)
 
-        val_loss = validate(wlfw_val_dataloader, plfd_backbone, auxiliarynet, criterion)
-
+        val_loss, cur_val_nme = validate(wlfw_val_dataloader, plfd_backbone, auxiliarynet, criterion)
+        if cur_val_nme < val_nme:
+            filename = os.path.join(str(args.snapshot), "checkpoint_min_nme.pth")
+            save_checkpoint({
+                'epoch': epoch,
+                'plfd_backbone': plfd_backbone.state_dict(),
+                'auxiliarynet': auxiliarynet.state_dict()
+            }, filename)
+            val_nme = cur_val_nme
         scheduler.step(val_loss)
 
         weighted_losses.append(weighted_train_loss.item())
         train_losses.append(train_loss.item())
         val_losses.append(val_loss.item())
-        logging.info("epoch: {}, weighted_train_loss: {:.4f}, train loss: {:.4f}  val:loss: {:.4f}\n"
-                     .format(epoch, weighted_train_loss, train_loss, val_loss))
+        logging.info("epoch: {}, weighted_train_loss: {:.4f}, train loss: {:.4f}  val loss: {:.4f} val nme: {:.4f}\n"
+                     .format(epoch, weighted_train_loss, train_loss, val_loss, val_nme))
 
     weighted_losses = " ".join(list(map(str, weighted_losses)))
     train_losses = " ".join(list(map(str, train_losses)))
@@ -167,8 +227,9 @@ def parse_args():
     parser = argparse.ArgumentParser(description='pfld')
     # general
     parser.add_argument('-j', '--workers', default=16, type=int)
-    parser.add_argument('--devices_id', default='0', type=str)  # TBD
-    parser.add_argument('--test_initial', default='false', type=str2bool)  #TBD
+    parser.add_argument('--backbone', default='v2', type=str, choices=["v2", "v3", "ghost"])
+    parser.add_argument('--devices_id', default='0', type=str)
+    parser.add_argument('--test_initial', default='false', type=str2bool)
 
     # training
     # -- optimizer
@@ -180,16 +241,16 @@ def parse_args():
 
     # -- epoch
     parser.add_argument('--start_epoch', default=1, type=int)
-    parser.add_argument('--end_epoch', default=1000, type=int)
+    parser.add_argument('--end_epoch', default=200, type=int)
 
     # -- snapshot、tensorboard log and checkpoint
     parser.add_argument(
         '--snapshot',
-        default='./checkpoint/snapshot/',
+        default='./checkpoint/',
         type=str,
         metavar='PATH')
     parser.add_argument(
-        '--log_file', default="./checkpoint/train.logs", type=str)
+        '--log_file', default="./checkpoint/train.log", type=str)
     parser.add_argument(
         '--tensorboard', default="./checkpoint/tensorboard", type=str)
     parser.add_argument(
@@ -207,9 +268,12 @@ def parse_args():
         default='./data/test_data/list.txt',
         type=str,
         metavar='PATH')
-    parser.add_argument('--train_batchsize', default=8, type=int)
-    parser.add_argument('--val_batchsize', default=1, type=int)
+    parser.add_argument('--train_batchsize', default=128, type=int)
+    parser.add_argument('--val_batchsize', default=8, type=int)
     args = parser.parse_args()
+    args.snapshot = os.path.join(args.snapshot, args.backbone)
+    args.log_file = os.path.join(args.snapshot, 'train_{}.log'.format(args.backbone))
+    os.makedirs(args.snapshot, exist_ok=True)
     return args
 
 

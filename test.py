@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------------
 import argparse
 import time
-
+import os
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
@@ -17,7 +17,7 @@ from torch.utils.data import DataLoader
 import torch.backends.cudnn as cudnn
 from dataset.datasets import WLFWDatasets
 
-from models.pfld import PFLDInference
+# from models.mobilev3_pfld import PFLDInference
 
 cudnn.benchmark = True
 cudnn.determinstic = True
@@ -74,7 +74,7 @@ def validate(wlfw_val_dataloader, plfd_backbone):
     nme_list = []
     cost_time = []
     with torch.no_grad():
-        for img, landmark_gt, _, _ in wlfw_val_dataloader:
+        for img, landmark_gt, _ in wlfw_val_dataloader:
             img = img.to(device)
             landmark_gt = landmark_gt.to(device)
             plfd_backbone = plfd_backbone.to(device)
@@ -118,12 +118,21 @@ def validate(wlfw_val_dataloader, plfd_backbone):
 
 
 def main(args):
+    if args.backbone == "v2":
+        from models.pfld import PFLDInference, AuxiliaryNet
+    elif args.backbone == "v3":
+        from models.mobilev3_pfld import PFLDInference, AuxiliaryNet
+    elif args.backbone == "ghost":
+        from models.ghost_pfld import PFLDInference, AuxiliaryNet
+    else:
+        raise ValueError("backbone is not implemented")
+
     checkpoint = torch.load(args.model_path, map_location=device)
     plfd_backbone = PFLDInference().to(device)
     plfd_backbone.load_state_dict(checkpoint['plfd_backbone'], strict=False)
 
     transform = transforms.Compose([transforms.ToTensor()])
-    wlfw_val_dataset = WLFWDatasets(args.test_dataset, transform)
+    wlfw_val_dataset = WLFWDatasets(args.test_dataset, transform, img_root=os.path.realpath('./data'))
     wlfw_val_dataloader = DataLoader(wlfw_val_dataset, batch_size=1, shuffle=False, num_workers=0)
 
     validate(wlfw_val_dataloader, plfd_backbone)
@@ -131,7 +140,8 @@ def main(args):
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Testing')
-    parser.add_argument('--model_path', default="./checkpoint/snapshot/checkpoint_epoch_131.pth", type=str)
+    parser.add_argument('--backbone', default='v2', type=str, choices=["v2", "v3", "ghost"])
+    parser.add_argument('--model_path', default="/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/checkpoint/v2/checkpoint_epoch_103.pth", type=str)
     parser.add_argument('--test_dataset', default='./data/test_data/list.txt', type=str)
     parser.add_argument('--show_image', default=False, type=bool)
     args = parser.parse_args()

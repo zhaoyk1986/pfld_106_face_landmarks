@@ -20,12 +20,7 @@ def SmoothL1(y_true, y_pred, beta=1):
     the extra beta parameter
     """
     mae = torch.abs(y_true - y_pred)
-    loss = torch.sum(
-        torch.where(
-            mae > beta,
-            mae - 0.5 * beta,
-            0.5 * mae ** 2 / beta),
-        axis=-1)
+    loss = torch.sum( torch.where(mae > beta, mae - 0.5 * beta, 0.5 * mae ** 2 / beta), axis=-1)
     return torch.mean(loss)
 
 

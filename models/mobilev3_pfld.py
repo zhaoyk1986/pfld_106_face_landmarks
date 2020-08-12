@@ -118,7 +118,7 @@ class MobileBottleneck(nn.Module):
 class PFLDInference(nn.Module):
     def __init__(self):
         super(PFLDInference, self).__init__()
-        self.use_attention = False
+        self.use_attention = True
         self.conv_bn1 = conv_bn(3, 16, 3, stride=1, nlin_layer=Hswish)
         self.conv_bn2 = MobileBottleneck(16, 16, 3, 1, 16, False, 'RE')
 
@@ -139,10 +139,11 @@ class PFLDInference(nn.Module):
 
         self.conv6_1 = MobileBottleneck(160, 16, 3, 1, 320, False, "HS")  # [16, 14, 14]
 
-        self.conv7 = conv_bn(16, 32, 3, 2, nlin_layer=Hswish)  # [32, 7, 7]
+        # self.conv7 = conv_bn(16, 32, 3, 2, nlin_layer=Hswish)  # [32, 7, 7]
+        self.conv7 = nn.Conv2d(16, 32, 3, 2, padding=1)
         # self.conv8 = conv_bn(32, 128, 7, 1, padding=0, nlin_layer=Hswish)  # [128, 1, 1]
         self.conv8 = nn.Conv2d(32, 128, 7, 1, 0)
-        self.hs = Hswish()
+        # self.hs = Hswish()
         self.avg_pool1 = nn.AvgPool2d(14)
         self.avg_pool2 = nn.AvgPool2d(7)
         self.fc = nn.Linear(176, 106 * 2)
@@ -172,7 +173,7 @@ class PFLDInference(nn.Module):
         x2 = self.avg_pool2(x)
         x2 = x2.view(x2.size(0), -1)
 
-        x3 = self.hs(self.conv8(x))
+        x3 = self.conv8(x)
         x3 = x3.view(x1.size(0), -1)
 
         multi_scale = torch.cat([x1, x2, x3], 1)

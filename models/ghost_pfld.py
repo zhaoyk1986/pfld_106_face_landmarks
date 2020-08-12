@@ -170,7 +170,7 @@ class GhostBottleneck(nn.Module):
 class PFLDInference(nn.Module):
     def __init__(self):
         super(PFLDInference, self).__init__()
-        self.use_attention = False
+        self.use_attention = True
         self.conv_bn1 = conv_bn(3, 16, 3, stride=1)
         self.conv_bn2 = GhostBottleneck(16, 64, 16, 3, 2, se=False)
 
@@ -189,12 +189,12 @@ class PFLDInference(nn.Module):
         self.block5_4 = GhostBottleneck(112, 672, 160, 3, 1, se=self.use_attention)
         # self.block5_5 = MobileBottleneck(160, 160, 3, 1, 960, True, "HS")
 
-        self.conv6_1 = GhostBottleneck(160, 320, 16, 3, 1, se=False)  # [16, 14, 14]
+        self.conv6_1 = GhostBottleneck(160, 80, 16, 3, 1, se=False)  # [16, 14, 14]
 
-        self.conv7 = conv_bn(16, 32, 3, 2)  # [32, 7, 7]
+        self.conv7 = nn.Conv2d(16, 32, 3, 2, padding=1)  # [32, 7, 7]
         # self.conv8 = conv_bn(32, 128, 7, 1, padding=0, nlin_layer=Hswish)  # [128, 1, 1]
         self.conv8 = nn.Conv2d(32, 128, 7, 1, 0)
-        self.hs = Hswish()
+        # self.hs = Hswish()
         self.avg_pool1 = nn.AvgPool2d(14)
         self.avg_pool2 = nn.AvgPool2d(7)
         self.fc = nn.Linear(176, 106 * 2)
@@ -224,7 +224,7 @@ class PFLDInference(nn.Module):
         x2 = self.avg_pool2(x)
         x2 = x2.view(x2.size(0), -1)
 
-        x3 = self.hs(self.conv8(x))
+        x3 = self.conv8(x)
         x3 = x3.view(x1.size(0), -1)
 
         multi_scale = torch.cat([x1, x2, x3], 1)

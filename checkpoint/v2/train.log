@@ -1,0 +1,20 @@
+[2020-08-12 16:54:03,554] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] workers: 16
+[2020-08-12 16:54:03,554] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] devices_id: 0
+[2020-08-12 16:54:03,554] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] test_initial: False
+[2020-08-12 16:54:03,554] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] base_lr: 0.0001
+[2020-08-12 16:54:03,554] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] weight_decay: 1e-06
+[2020-08-12 16:54:03,554] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] lr_patience: 40
+[2020-08-12 16:54:03,554] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] start_epoch: 1
+[2020-08-12 16:54:03,554] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] end_epoch: 200
+[2020-08-12 16:54:03,554] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] snapshot: ./checkpoint/v2/
+[2020-08-12 16:54:03,555] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] log_file: ./checkpoint/v2/train.log
+[2020-08-12 16:54:03,555] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] tensorboard: ./checkpoint/tensorboard
+[2020-08-12 16:54:03,555] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] resume: /Users/xintao/Documents/GitHub/pfld_106_face_landmarks/checkpoint/snapshot/checkpoint_epoch_70.pth
+[2020-08-12 16:54:03,555] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] epoch_interval: 1
+[2020-08-12 16:54:03,555] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] dataroot: ./data/train_data/list.txt
+[2020-08-12 16:54:03,555] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] val_dataroot: ./data/test_data/list.txt
+[2020-08-12 16:54:03,555] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] train_batchsize: 128
+[2020-08-12 16:54:03,555] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:23] [INFO] val_batchsize: 8
+[2020-08-12 16:54:03,555] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:134] [INFO] loading the checkpoint from /Users/xintao/Documents/GitHub/pfld_106_face_landmarks/checkpoint/snapshot/checkpoint_epoch_70.pth
+[2020-08-12 16:54:05,354] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:28] [INFO] Save checkpoint to ./checkpoint/v2/checkpoint_epoch_70.pth
+[2020-08-12 16:55:03,914] [p28344] [/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/train.py:28] [INFO] Save checkpoint to ./checkpoint/v2/checkpoint_min_nme.pth

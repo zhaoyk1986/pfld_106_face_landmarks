@@ -10,7 +10,7 @@ import cv2
 
 
 onnx_model_path = "./output/pfld-sim.onnx"
-img_path = "/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/result.jpg"
+img_path = "./1.png"
 img = cv2.imread(img_path)
 show_img = True
 
@@ -37,5 +37,8 @@ if show_img:
     landmarks[:, 1] = landmarks[:, 1] * img.shape[0]
     img_copy = img.copy().astype(np.uint8)
     for (x, y) in landmarks:
-        cv2.circle(img_copy, (int(x), int(y)), 4, (0, 0, 255), -1)
-    cv2.imwrite('result.jpg', img_copy)
+        cv2.circle(img_copy, (int(x), int(y)), 2, (0, 0, 255), -1)
+    cv2.imshow('demo', img_copy)
+    cv2.waitKey()
+    cv2.destroyAllWindows()
+    # cv2.imwrite('result1.jpg', img_copy)
