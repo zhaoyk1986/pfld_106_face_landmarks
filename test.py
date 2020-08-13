@@ -124,8 +124,8 @@ def main(args):
         from models.mobilev3_pfld import PFLDInference, AuxiliaryNet
     elif args.backbone == "ghost":
         from models.ghost_pfld import PFLDInference, AuxiliaryNet
-    elif args.backbone == "v3_small":
-        from models.mobilev3_small_pfld import PFLDInference, AuxiliaryNet
+    elif args.backbone == "lite":
+        from models.lite import PFLDInference, AuxiliaryNet
     else:
         raise ValueError("backbone is not implemented")
 
@@ -142,8 +142,8 @@ def main(args):
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Testing')
-    parser.add_argument('--backbone', default='v2', type=str, choices=["v2", "v3", "ghost"])
-    parser.add_argument('--model_path', default="/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/checkpoint/v2/checkpoint_epoch_103.pth", type=str)
+    parser.add_argument('--backbone', default='v2', type=str, choices=["v2", "v3", "lite", "ghost"])
+    parser.add_argument('--model_path', default="", type=str)
     parser.add_argument('--test_dataset', default='./data/test_data/list.txt', type=str)
     parser.add_argument('--show_image', default=False, type=bool)
     args = parser.parse_args()
