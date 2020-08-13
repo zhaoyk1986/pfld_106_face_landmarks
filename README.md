@@ -17,14 +17,14 @@
   | :---------------: | :---: | :----: | :---: | :----------------------------: | :--: |
   |    MobileNetV2    | 1.26M |  393M  | 4.96% |    [v2](checkpoint/v2/v2.pth)    | [v2.onnx](output/v2.onnx) |
   |    MobileNetV3    | 1.44M | 201.8M | 4.57% |    [v3](checkpoint/v3/v3.pth)    | [v3.onnx](output/v3.onnx) |
-  | MobileNetV3_Small | 0.94M | 42.3M  | 6.16% | [v3 small](checkpoint/v3/v3_small.pth) | [v3_small.onnx](output/v3_small.onnx) |
+  | MobileNetV3_Small | 0.22M | 13M | 6.16% | [v3 small](checkpoint/v3/v3_small.pth) | [v3_small.onnx](output/v3_small.onnx) |
 
 测试电脑MacBook 2017 13-Inch   CPU i5-3.1GHz
 |   backbone    | FPS(onnxruntime cpu) |  Time(single face)  |
 | :-----------: | :------------------: | :----: |
 |    v2.onnx    |         60.9         |  16ms  |
 |    V3.onnx    |         62.7         | 15.9ms |
-| V3_small.onnx |        194.9         | 5.13ms |
+| lite.onnx |        194.9         | 5.13ms |
 
 -  Requirements
 
@@ -61,7 +61,7 @@
 
   ```bash
   CUDA_VISIBLE_DEVICES=0 python train.py --backbone=v3
-  # 可选backbone为v2 v3 v3_small
+  # 可选backbone为v2 v3 lite
   ```
   
 - 结果 (MobileNetV2)

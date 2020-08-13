@@ -95,7 +95,7 @@ class AuxiliaryNet(nn.Module):
         self.conv2 = conv_bn1(128, 128, 3, 1)
         self.conv3 = conv_bn1(128, 32, 3, 2)
         self.conv4 = conv_bn1(32, 128, 3, 1)
-        self.max_pool1 = nn.MaxPool2d(4)
+        self.max_pool1 = nn.AdaptiveMaxPool2d(1)
         self.fc1 = nn.Linear(128, 32)
         self.fc2 = nn.Linear(32, 3)
 
@@ -113,7 +113,7 @@ class AuxiliaryNet(nn.Module):
 
 
 if __name__ == '__main__':
-    dummy_input = torch.randn(1, 3, 112, 112)
+    dummy_input = torch.randn(1, 3, 224, 224)
     plfd_backbone = PFLDInference()
     # print(plfd_backbone)
     # torch.save(plfd_backbone.state_dict(), 'lite.pth')

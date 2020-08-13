@@ -1,19 +1,19 @@
 import onnx
 import os
 import argparse
-from models.mobilev3_pfld import PFLDInference
+from models.lite import PFLDInference
 import torch
 import onnxsim
 
 parser = argparse.ArgumentParser(description='pytorch2onnx')
 parser.add_argument(
     '--torch_model',
-    default="/Users/xintao/Downloads/github/pfld_106_face_landmarks/checkpoint/v3/v3.pth")
+    default="/Users/xintao/Documents/GitHub/pfld_106_face_landmarks/checkpoint/lite.pth")
 parser.add_argument('--onnx_model', default="./output/pfld.onnx")
 parser.add_argument(
     '--onnx_model_sim',
     help='Output ONNX model',
-    default="./output/v3.onnx")
+    default="./output/lite.onnx")
 args = parser.parse_args()
 
 print("=====> load pytorch checkpoint...")
@@ -23,7 +23,7 @@ plfd_backbone.load_state_dict(torch.load(args.torch_model, map_location=torch.de
 print("PFLD bachbone:", plfd_backbone)
 
 print("=====> convert pytorch model to onnx...")
-dummy_input = torch.randn(1, 3, 112, 112)
+dummy_input = torch.randn(1, 3, 224, 224)
 input_names = ["input"]
 output_names = ["output1", "output"]
 torch.onnx.export(

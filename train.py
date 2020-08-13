@@ -10,7 +10,6 @@ from torch.utils.data import DataLoader
 import torchvision
 from torchvision import datasets, transforms
 from dataset.datasets import WLFWDatasets
-# from models.mobilev3_pfld import PFLDInference, AuxiliaryNet
 from pfld.loss import PFLDLoss as LandMarkLoss
 from pfld.utils import AverageMeter
 
@@ -168,7 +167,8 @@ def main(args):
     # step 3: data
     # argumetion
     transform = transforms.Compose([transforms.ToTensor()])
-    wlfwdataset = WLFWDatasets(args.dataroot, transform, img_root=os.path.realpath('./data'))
+    wlfwdataset = WLFWDatasets(args.dataroot, transform,
+                               img_root=os.path.realpath('./data'), img_size=args.img_size)
     dataloader = DataLoader(
         wlfwdataset,
         batch_size=args.train_batchsize,
@@ -176,7 +176,8 @@ def main(args):
         num_workers=args.workers,
         drop_last=False)
 
-    wlfw_val_dataset = WLFWDatasets(args.val_dataroot, transform, img_root=os.path.realpath('./data'))
+    wlfw_val_dataset = WLFWDatasets(args.val_dataroot, transform,
+                                    img_root=os.path.realpath('./data'), img_size=args.img_size)
     wlfw_val_dataloader = DataLoader(
         wlfw_val_dataset,
         batch_size=args.val_batchsize,
@@ -214,7 +215,7 @@ def main(args):
         weighted_losses.append(weighted_train_loss.item())
         train_losses.append(train_loss.item())
         val_losses.append(val_loss.item())
-        logging.info("epoch: {}, weighted_train_loss: {:.4f}, train loss: {:.4f}  val loss: {:.4f} val nme: {:.4f}\n"
+        logging.info("epoch: {}, weighted_train_loss: {:.4f}, train loss: {:.4f}  val loss: {:.4f}  val nme: {:.4f}\n"
                      .format(epoch, weighted_train_loss, train_loss, val_loss, val_nme))
 
     weighted_losses = " ".join(list(map(str, weighted_losses)))
@@ -237,6 +238,7 @@ def parse_args():
     # -- optimizer
     parser.add_argument('--base_lr', default=0.0001, type=int)
     parser.add_argument('--weight-decay', '--wd', default=1e-6, type=float)
+    parser.add_argument('--img_size', default=112, type=int)
 
     # -- lr
     parser.add_argument("--lr_patience", default=40, type=int)

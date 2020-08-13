@@ -244,7 +244,7 @@ def get_dataset_list(imgDir, outDir, landmarkFile, is_train, test_ratio=0.1):
             lines = lines[num_train:]
 
         for i, line in enumerate(tqdm(lines)):
-            Img = ImageDate(line, imgDir)
+            Img = ImageDate(line, imgDir, image_size=crop_img_size)
             img_name = Img.path
             Img.load_data(is_train, 5)
             _, filename = os.path.split(img_name)
@@ -260,7 +260,7 @@ def get_dataset_list(imgDir, outDir, landmarkFile, is_train, test_ratio=0.1):
 if __name__ == '__main__':
     root_dir = os.path.dirname(os.path.realpath(__file__))
     imageDirs = './imgs'
-
+    crop_img_size = 112
     landmarkFile = os.path.join(root_dir, "bbox_landmark.txt")
 
     outDirs = ['test_data', 'train_data']

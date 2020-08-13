@@ -147,10 +147,11 @@ def rotate(img, annotation, alpha=30):
 
 
 class WLFWDatasets(data.Dataset):
-    def __init__(self, file_list, transforms=None, img_root=None):
+    def __init__(self, file_list, transforms=None, img_root=None, img_size=112):
         assert img_root is not None
         self.line = None
         self.path = None
+        self.img_size = img_size
         self.landmarks = None
         self.filenames = None
         self.euler_angle = None
@@ -162,6 +163,7 @@ class WLFWDatasets(data.Dataset):
     def __getitem__(self, index):
         self.line = self.lines[index].strip().split()
         self.img = cv2.imread(os.path.join(self.img_root, self.line[0]))
+        self.img = cv2.resize(self.img, (self.img_size, self.img_size))
         self.landmark = np.asarray(self.line[1:213], dtype=np.float32)
         self.euler_angle = np.asarray(self.line[213:], dtype=np.float32)
         if self.transforms:

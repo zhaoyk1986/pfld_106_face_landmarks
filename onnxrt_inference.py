@@ -9,13 +9,13 @@ import time
 import cv2
 
 
-onnx_model_path = "./output/v3_small.onnx"
+onnx_model_path = "./output/lite.onnx"
 img_path = "./1.png"
 img = cv2.imread(img_path)
-show_img = False
+show_img = True
 
 # 网络输入是BGR格式的图片
-img1 = cv2.resize(img, (112, 112))
+img1 = cv2.resize(img, (224, 224))
 image_data = img1.transpose(2, 0, 1)[np.newaxis].astype(np.float32) / 255
 
 
