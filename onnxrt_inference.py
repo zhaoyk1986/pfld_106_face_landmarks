@@ -9,10 +9,10 @@ import time
 import cv2
 
 
-onnx_model_path = "./output/pfld-sim.onnx"
+onnx_model_path = "./output/v3_small.onnx"
 img_path = "./1.png"
 img = cv2.imread(img_path)
-show_img = True
+show_img = False
 
 # 网络输入是BGR格式的图片
 img1 = cv2.resize(img, (112, 112))
@@ -28,7 +28,7 @@ for i in range(100):
     output = session.run([], {input_name: image_data})[1]
 
 t = (time.time() - tic) / 100
-print('average infer time: {:.4f}ms, FPS: {:.2f}'.format(t, 1 / t))
+print('average infer time: {:.4f}ms, FPS: {:.2f}'.format(t * 1000, 1 / t))
 print('output.shape: ', output.shape)
 # print(output[0])
 if show_img:

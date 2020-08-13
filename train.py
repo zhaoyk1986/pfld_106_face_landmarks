@@ -137,6 +137,8 @@ def main(args):
         from models.mobilev3_pfld import PFLDInference, AuxiliaryNet
     elif args.backbone == "ghost":
         from models.ghost_pfld import PFLDInference, AuxiliaryNet
+    elif args.backbone == "v3_small":
+        from models.mobilev3_small_pfld import PFLDInference, AuxiliaryNet
     else:
         raise ValueError("backbone is not implemented")
     plfd_backbone = PFLDInference()
@@ -227,7 +229,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='pfld')
     # general
     parser.add_argument('-j', '--workers', default=16, type=int)
-    parser.add_argument('--backbone', default='v2', type=str, choices=["v2", "v3", "ghost"])
+    parser.add_argument('--backbone', default='v2', type=str, choices=["v2", "v3", "ghost", "v3_small"])
     parser.add_argument('--devices_id', default='0', type=str)
     parser.add_argument('--test_initial', default='false', type=str2bool)
 
@@ -268,7 +270,7 @@ def parse_args():
         default='./data/test_data/list.txt',
         type=str,
         metavar='PATH')
-    parser.add_argument('--train_batchsize', default=128, type=int)
+    parser.add_argument('--train_batchsize', default=256, type=int)
     parser.add_argument('--val_batchsize', default=8, type=int)
     args = parser.parse_args()
     args.snapshot = os.path.join(args.snapshot, args.backbone)
