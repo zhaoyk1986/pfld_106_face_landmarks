@@ -124,6 +124,8 @@ def main(args):
         from models.mobilev3_pfld import PFLDInference, AuxiliaryNet
     elif args.backbone == "ghost":
         from models.ghost_pfld import PFLDInference, AuxiliaryNet
+    elif args.backbone == "v3_small":
+        from models.mobilev3_small_pfld import PFLDInference, AuxiliaryNet
     else:
         raise ValueError("backbone is not implemented")
 
