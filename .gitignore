@@ -1,13 +1,13 @@
 __pycache__/
 *.py[cod]
 *$py.class
-checkpoint/*.logs
+*.log
+*.logs
 data/imgs
 data/test_data
 data/train_data
 .idea
 .DS_Store
-*.pth
 
 xxx.jpg
 0_image00002_0.jpg
