@@ -14,3 +14,4 @@ xxx.jpg
 *.ipynb
 *.log
 checkpoint/v3/train_v3.log
+*.log
