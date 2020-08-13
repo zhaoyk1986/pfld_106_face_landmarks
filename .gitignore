@@ -8,7 +8,7 @@ data/train_data
 .idea
 .DS_Store
 *.pth
-output
 
 xxx.jpg
 0_image00002_0.jpg
+*.ipynb
