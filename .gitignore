@@ -12,3 +12,5 @@ data/train_data
 xxx.jpg
 0_image00002_0.jpg
 *.ipynb
+*.log
+checkpoint/v3/train_v3.log
