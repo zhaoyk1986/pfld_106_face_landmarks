@@ -1,7 +1,7 @@
 # pfld_106_face_landmarks
 106点人脸关键点检测的PFLD算法实现
 
-- [x] 😊[cpp推理代码 ](https://github.com/Hsintao/pfld-ncnn)
+- [x] 😊[ncnn cpp推理代码 ](https://github.com/Hsintao/pfld-ncnn)
 
 - [x] 转换后的ONNX模型
 
