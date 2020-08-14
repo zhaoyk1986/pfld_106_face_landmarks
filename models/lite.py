@@ -48,7 +48,7 @@ class PFLDInference(nn.Module):
         super(PFLDInference, self).__init__()
         self.base_channel = 16
         self.model = nn.Sequential(
-            conv_bn(3, self.base_channel, 2),  # 56*56
+            conv_bn(3, self.base_channel, 1),  # 56*56
             conv_dw(self.base_channel, self.base_channel * 2, 1),
             conv_dw(self.base_channel * 2, self.base_channel * 2, 2),
             conv_dw(self.base_channel * 2, self.base_channel * 2, 1),
@@ -60,7 +60,7 @@ class PFLDInference(nn.Module):
         self.model1 = nn.Sequential(
             conv_dw(self.base_channel * 4, self.base_channel * 8, 2),
             conv_dw(self.base_channel * 8, self.base_channel * 8, 1),
-            conv_dw(self.base_channel * 8, self.base_channel * 8, 2),
+            conv_dw(self.base_channel * 8, self.base_channel * 8, 1),
             conv_dw(self.base_channel * 8, self.base_channel * 16, 1),
             conv_dw(self.base_channel * 16, self.base_channel * 16, 1))
 
@@ -70,21 +70,33 @@ class PFLDInference(nn.Module):
             SeperableConv2d(in_channels=self.base_channel * 4, out_channels=self.base_channel * 8,
                             kernel_size=3, stride=2, padding=1),
         )
-        conv_dw(self.base_channel * 4, self.base_channel * 8, 2),
-        conv_dw(self.base_channel * 8, self.base_channel * 8, 1),
-        conv_dw(self.base_channel * 8, self.base_channel * 8, 2),
-        conv_dw(self.base_channel * 8, self.base_channel * 16, 1),
-        conv_dw(self.base_channel * 16, self.base_channel * 16, 1)
+
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+
+        self.conv1 = nn.Conv2d(64, 16, kernel_size=3, padding=1, stride=1)
         self.avg_pool1 = nn.AdaptiveAvgPool2d(1)
-        self.fc = nn.Linear(128, 106 * 2)
+        self.conv2 = nn.Conv2d(256, 64, kernel_size=1, stride=1)
+        self.avg_pool2 = nn.AdaptiveAvgPool2d(1)
+
+        self.fc = nn.Linear(208, 106 * 2)
 
     def forward(self, x):  # x: 3, 112, 112
-        out = self.model(x)
-        x = self.model1(out)
-        x = self.extra(x)
-        x = self.avg_pool1(x)
-        x = x.view(x.size(0), -1)
-        landmarks = self.fc(x)
+        out = self.model(x)  # 28
+        x1 = self.conv1(out)
+        x1 = self.avg_pool1(x1)
+        x1 = x1.view(x1.size(0), -1)
+
+        x = self.model1(out)  # 14
+        x2 = self.conv2(x)
+        x2 = self.avg_pool2(x2)
+        x2 = x2.view(x2.size(0), -1)
+
+        x = self.extra(x)  # 7
+        x = self.avg_pool(x)
+        x3 = x.view(x.size(0), -1)
+        multi_scale = torch.cat([x1, x2, x3], 1)
+        # print(multi_scale.shape)
+        landmarks = self.fc(multi_scale)
         return out, landmarks
 
 
@@ -113,7 +125,7 @@ class AuxiliaryNet(nn.Module):
 
 
 if __name__ == '__main__':
-    dummy_input = torch.randn(1, 3, 224, 224)
+    dummy_input = torch.randn(1, 3, 112, 112)
     plfd_backbone = PFLDInference()
     # print(plfd_backbone)
     # torch.save(plfd_backbone.state_dict(), 'lite.pth')
@@ -124,7 +136,7 @@ if __name__ == '__main__':
     auxiliarynet = AuxiliaryNet()
     import time
     tic = time.time()
-    N = 100
+    N = 1
     for i in range(N):
         features, landmarks_ = plfd_backbone(dummy_input)
     average_infer_time = (time.time() - tic) / N

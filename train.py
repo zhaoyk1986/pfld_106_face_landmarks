@@ -215,8 +215,8 @@ def main(args):
         weighted_losses.append(weighted_train_loss.item())
         train_losses.append(train_loss.item())
         val_losses.append(val_loss.item())
-        logging.info("epoch: {}, weighted_train_loss: {:.4f}, train loss: {:.4f}  val loss: {:.4f}  val nme: {:.4f}\n"
-                     .format(epoch, weighted_train_loss, train_loss, val_loss, val_nme))
+        logging.info("epoch: {}, weighted_train_loss: {:.4f}, trainset loss: {:.4f}  valset loss: {:.4f}  best val "
+                     "nme: {:.4f}\n ".format(epoch, weighted_train_loss, train_loss, val_loss, val_nme))
 
     weighted_losses = " ".join(list(map(str, weighted_losses)))
     train_losses = " ".join(list(map(str, train_losses)))

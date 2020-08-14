@@ -9,13 +9,13 @@ import time
 import cv2
 
 
-onnx_model_path = "./output/lite.onnx"
+onnx_model_path = "./output/v3.onnx"
 img_path = "./1.png"
 img = cv2.imread(img_path)
 show_img = True
 
 # 网络输入是BGR格式的图片
-img1 = cv2.resize(img, (224, 224))
+img1 = cv2.resize(img, (112, 112))
 image_data = img1.transpose(2, 0, 1)[np.newaxis].astype(np.float32) / 255
 
 
@@ -24,10 +24,10 @@ session = onnxruntime.InferenceSession(onnx_model_path, None)
 input_name = session.get_inputs()[0].name
 import time
 tic = time.time()
-for i in range(100):
+for i in range(1000):
     output = session.run([], {input_name: image_data})[1]
 
-t = (time.time() - tic) / 100
+t = (time.time() - tic) / 1000
 print('average infer time: {:.4f}ms, FPS: {:.2f}'.format(t * 1000, 1 / t))
 print('output.shape: ', output.shape)
 # print(output[0])

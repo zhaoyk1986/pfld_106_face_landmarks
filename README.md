@@ -16,15 +16,15 @@
   |     Backbone      | param |  MACC  |  nme  |              Link              | ONNX |
   | :---------------: | :---: | :----: | :---: | :----------------------------: | :--: |
   |    MobileNetV2    | 1.26M |  393M  | 4.96% |    [v2](checkpoint/v2/v2.pth)    | [v2.onnx](output/v2.onnx) |
-  |    MobileNetV3    | 1.44M | 201.8M | 4.57% |    [v3](checkpoint/v3/v3.pth)    | [v3.onnx](output/v3.onnx) |
-  | MobileNetV3_Small | 0.22M | 13M | 6.16% | [v3 small](checkpoint/v3/v3_small.pth) | [v3_small.onnx](output/v3_small.onnx) |
+  |    MobileNetV3    | 1.44M | 201.8M | 4.41% |    [v3](checkpoint/v3/v3.pth)    | [v3.onnx](output/v3.onnx) |
+  | MobileNetV3_Small | 0.22M | 13M |  | [lite](checkpoint/lite/lite.pth) | [lite.onnx](output/lite.onnx) |
 
-测试电脑MacBook 2017 13-Inch   CPU i5-3.1GHz
+测试电脑MacBook 2017 13-Inch   CPU i5-3.1GHz (single core)
 |   backbone    | FPS(onnxruntime cpu) |  Time(single face)  |
 | :-----------: | :------------------: | :----: |
 |    v2.onnx    |         60.9         |  16ms  |
 |    V3.onnx    |         62.7         | 15.9ms |
-| lite.onnx |        194.9         | 5.13ms |
+| lite.onnx |        255        | 3.9ms |
 
 -  Requirements
 
