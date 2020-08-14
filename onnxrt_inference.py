@@ -24,10 +24,10 @@ session = onnxruntime.InferenceSession(onnx_model_path, None)
 input_name = session.get_inputs()[0].name
 import time
 tic = time.time()
-for i in range(1000):
+for i in range(100):
     output = session.run([], {input_name: image_data})[1]
 
-t = (time.time() - tic) / 1000
+t = (time.time() - tic) / 100
 print('average infer time: {:.4f}ms, FPS: {:.2f}'.format(t * 1000, 1 / t))
 print('output.shape: ', output.shape)
 # print(output[0])
