@@ -13,7 +13,6 @@ def flip(img, annotation):
     # parse
     img = np.fliplr(img).copy()
     h, w = img.shape[:2]
-    
     x_min, y_min, x_max, y_max = annotation[0:4]
     landmark_x = annotation[4::2]
     landmark_y = annotation[4+1::2] 
@@ -146,7 +145,7 @@ def rotate(img, annotation, alpha=30):
     return img_rotated_by_alpha, new_annotation
 
 
-class WLFWDatasets(data.Dataset):
+class PFLDDatasets(data.Dataset):
     def __init__(self, file_list, transforms=None, img_root=None, img_size=112):
         assert img_root is not None
         self.line = None
@@ -176,7 +175,7 @@ class WLFWDatasets(data.Dataset):
 
 if __name__ == '__main__':
     file_list = '../data/test_data/list.txt'
-    wlfwdataset = WLFWDatasets(file_list, img_root=os.path.realpath('../data'))
+    wlfwdataset = PFLDDatasets(file_list, img_root=os.path.realpath('../data'))
     dataloader = DataLoader(wlfwdataset, batch_size=1, shuffle=True, num_workers=0, drop_last=False)
     for img, landmark,  euler_angle in dataloader:
         print("img shape", img.shape)

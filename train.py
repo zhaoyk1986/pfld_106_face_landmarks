@@ -9,7 +9,7 @@ import torch
 from torch.utils.data import DataLoader
 import torchvision
 from torchvision import datasets, transforms
-from dataset.datasets import WLFWDatasets
+from dataset.datasets import PFLDDatasets
 from pfld.loss import PFLDLoss as LandMarkLoss
 from pfld.utils import AverageMeter
 
@@ -167,7 +167,7 @@ def main(args):
     # step 3: data
     # argumetion
     transform = transforms.Compose([transforms.ToTensor()])
-    wlfwdataset = WLFWDatasets(args.dataroot, transform,
+    wlfwdataset = PFLDDatasets(args.dataroot, transform,
                                img_root=os.path.realpath('./data'), img_size=args.img_size)
     dataloader = DataLoader(
         wlfwdataset,
@@ -176,7 +176,7 @@ def main(args):
         num_workers=args.workers,
         drop_last=False)
 
-    wlfw_val_dataset = WLFWDatasets(args.val_dataroot, transform,
+    wlfw_val_dataset = PFLDDatasets(args.val_dataroot, transform,
                                     img_root=os.path.realpath('./data'), img_size=args.img_size)
     wlfw_val_dataloader = DataLoader(
         wlfw_val_dataset,

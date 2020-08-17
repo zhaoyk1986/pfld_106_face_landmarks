@@ -15,7 +15,7 @@ import torch
 from torchvision import transforms
 from torch.utils.data import DataLoader
 import torch.backends.cudnn as cudnn
-from dataset.datasets import WLFWDatasets
+from dataset.datasets import PFLDDatasets
 
 # from models.mobilev3_pfld import PFLDInference
 
@@ -134,7 +134,7 @@ def main(args):
     plfd_backbone.load_state_dict(checkpoint['plfd_backbone'], strict=False)
 
     transform = transforms.Compose([transforms.ToTensor()])
-    wlfw_val_dataset = WLFWDatasets(args.test_dataset, transform, img_root=os.path.realpath('./data'))
+    wlfw_val_dataset = PFLDDatasets(args.test_dataset, transform, img_root=os.path.realpath('./data'))
     wlfw_val_dataloader = DataLoader(wlfw_val_dataset, batch_size=1, shuffle=False, num_workers=0)
 
     validate(wlfw_val_dataloader, plfd_backbone)
